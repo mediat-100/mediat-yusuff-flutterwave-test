@@ -8,6 +8,8 @@ const app = express();
 const server = http.createServer(app);
 
 app.use(express.json());
+
+// route
 app.use("/api/v1/lannister-pay", splitRouter);
 
 // db connection

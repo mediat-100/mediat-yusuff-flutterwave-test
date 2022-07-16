@@ -1,21 +1,6 @@
 const SplitInfo = require("../models/splitInfo");
 const SplitBreakdown = require("../models/splitBreakdown");
 
-exports.createTransaction = async (req, res) => {
-	try {
-		const transaction = await SplitInfo.create(req.body);
-		// console.log("lengthSplit", transaction.splitInfo.length);
-		res.status(200).json({
-			transaction,
-		});
-	} catch (err) {
-		console.log("error", err);
-		res.status(500).json({
-			error: err,
-		});
-	}
-};
-
 exports.splitHandler = async (req, res) => {
 	try {
 		// check if splifInfo exist
@@ -30,7 +15,7 @@ exports.splitHandler = async (req, res) => {
 		let initialBalance = req.body.Amount;
 		const splitInfoArray = newSplitInfo.SplitInfo;
 
-		// split process for FLAT 
+		// split process for FLAT
 		const flatAmount = splitInfoArray
 			.filter((el) => el.SplitType === "FLAT")
 			.map((el) => {
@@ -51,15 +36,14 @@ exports.splitHandler = async (req, res) => {
 				return { SplitEntityId: el.SplitEntityId, SplitValue: amount };
 			});
 
-		let sum = 0;
-
+		// split process for RATIO
 		const ratioArray = splitInfoArray.filter((el) => el.SplitType === "RATIO");
 
+		let sum = 0;
 		ratioArray.forEach((el) => {
 			sum += el.SplitValue;
 		});
 
-		// split process for RATIO
 		const openingRatioBalance = initialBalance;
 
 		const ratioAmount = ratioArray.map((el) => {
@@ -68,6 +52,7 @@ exports.splitHandler = async (req, res) => {
 			return { SplitEntityId: el.SplitEntityId, SplitValue: amount };
 		});
 
+		// array of all split process
 		const splitBreakdown = [...flatAmount, ...percAmount, ...ratioAmount];
 
 		let totalProcessingFee = 0;
@@ -75,20 +60,21 @@ exports.splitHandler = async (req, res) => {
 			totalProcessingFee += el.SplitValue;
 		});
 
+		// Total balance after the split process
 		const Balance = newSplitInfo.Amount - totalProcessingFee;
 
-		// console.log(initialBalance);
-		// console.log("totalProcessingFee", totalProcessingFee);
-		// console.log("Balance", Balance);
-
+		// save splitBreakdown to DB
 		const processingFeeToDB = await SplitBreakdown.create({
+			SplitId: newSplitInfo._id,
 			ID: newSplitInfo.ID,
 			Balance: Balance,
 			SplitBreakdown: splitBreakdown,
 		});
 
 		res.status(200).json({
-			processingFeeToDB,
+			ID: processingFeeToDB.ID,
+			Balance: processingFeeToDB.Balance,
+			SplitBreakdown: processingFeeToDB.SplitBreakdown,
 		});
 	} catch (err) {
 		console.log("error", err);

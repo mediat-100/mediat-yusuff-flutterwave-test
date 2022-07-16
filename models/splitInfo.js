@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const { v4: uuidv4 } = require("uuid");
 
 function arrayLimit(val) {
 	return val.length >= 1 && val.length <= 20;
@@ -11,7 +10,7 @@ const splitInfoSchema = new mongoose.Schema({
 	Amount: Number,
 	Balance: {
 		type: Number,
-		min: [0.01, 'Balance must be greater than zero']
+		min: [0.01, "Balance must be greater than zero"],
 	},
 	Currency: {
 		type: String,
@@ -35,7 +34,7 @@ const splitInfoSchema = new mongoose.Schema({
 				},
 				SplitEntityId: {
 					type: String,
-					unique: true
+					unique: true,
 				},
 			},
 		],

@@ -1,8 +1,14 @@
 const mongoose = require("mongoose");
 
 const splitBreakdownSchema = new mongoose.Schema({
+    SplitId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'SplitInfo'
+    },
 	ID: {
-		type: Number
+		type: Number,
+        unique: true,
+        min: 1
 	},
 	Balance: {
 		type: Number,
