@@ -30,7 +30,7 @@ const splitInfoSchema = new mongoose.Schema({
 				},
 				SplitValue: {
 					type: Number,
-					min: [1, "Split value must be at least 1"],
+					min: [0, "Split value must be at least 0"],
 				},
 				SplitEntityId: {
 					type: String,

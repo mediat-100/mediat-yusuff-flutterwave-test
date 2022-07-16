@@ -1,16 +1,9 @@
 require("dotenv").config();
 const http = require("http");
-const express = require("express");
 const mongoose = require("mongoose");
-const splitRouter = require("./routes/splitRoute");
-const app = express();
+const app = require("./app.js");
 
 const server = http.createServer(app);
-
-app.use(express.json());
-
-// route
-app.use("/api/v1/lannister-pay", splitRouter);
 
 // db connection
 mongoose

@@ -3,6 +3,14 @@ const SplitBreakdown = require("../models/splitBreakdown");
 
 exports.splitHandler = async (req, res) => {
 	try {
+		// check if splitValue is not greater than amount
+		const SplitInfoArray = req.body.SplitInfo;
+
+		SplitInfoArray.filter((el) => {
+			if (el.SplitValue > req.body.Amount)
+				throw new Error("SplitValue cannot be greater than amount");
+		});
+
 		// check if splifInfo exist
 		const existingSplitInfo = await SplitInfo.findOne({ ID: req.body.ID });
 
@@ -59,6 +67,12 @@ exports.splitHandler = async (req, res) => {
 		splitBreakdown.forEach((el) => {
 			totalProcessingFee += el.SplitValue;
 		});
+
+		// check if sum of split values greater than amount
+		if (totalProcessingFee > req.body.Amount)
+			throw new Error(
+				"The sum of all split Amount values computed cannot be greated than the Amounnt"
+			);
 
 		// Total balance after the split process
 		const Balance = newSplitInfo.Amount - totalProcessingFee;
