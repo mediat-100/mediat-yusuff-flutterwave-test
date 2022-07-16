@@ -27,11 +27,11 @@ exports.splitHandler = async (req, res) => {
 		const flatAmount = splitInfoArray
 			.filter((el) => el.SplitType === "FLAT")
 			.map((el) => {
-				return { SplitEntityId: el.SplitEntityId, SplitValue: el.SplitValue };
+				return { SplitEntityId: el.SplitEntityId, Amount: el.SplitValue };
 			});
 
 		flatAmount.forEach((el) => {
-			initialBalance -= el.SplitValue;
+			initialBalance -= el.Amount;
 		});
 
 		// split process for PERCENTAGE
@@ -41,23 +41,23 @@ exports.splitHandler = async (req, res) => {
 				const amount = (el.SplitValue / 100) * initialBalance;
 				initialBalance = initialBalance - amount;
 
-				return { SplitEntityId: el.SplitEntityId, SplitValue: amount };
+				return { SplitEntityId: el.SplitEntityId, Amount: amount };
 			});
 
 		// split process for RATIO
 		const ratioArray = splitInfoArray.filter((el) => el.SplitType === "RATIO");
 
-		let sum = 0;
+		let ratioSum = 0;
 		ratioArray.forEach((el) => {
-			sum += el.SplitValue;
+			ratioSum += el.SplitValue;
 		});
 
 		const openingRatioBalance = initialBalance;
 
 		const ratioAmount = ratioArray.map((el) => {
-			const amount = (el.SplitValue / sum) * openingRatioBalance;
+			const amount = (el.SplitValue / ratioSum) * openingRatioBalance;
 
-			return { SplitEntityId: el.SplitEntityId, SplitValue: amount };
+			return { SplitEntityId: el.SplitEntityId, Amount: amount };
 		});
 
 		// array of all split process
@@ -65,7 +65,7 @@ exports.splitHandler = async (req, res) => {
 
 		let totalProcessingFee = 0;
 		splitBreakdown.forEach((el) => {
-			totalProcessingFee += el.SplitValue;
+			totalProcessingFee += el.Amount;
 		});
 
 		// check if sum of split values greater than amount
